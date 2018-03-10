@@ -1,0 +1,36 @@
+version: "2"
+services:
+  app:
+    container_name: app
+    environment:
+        - NPM_SCRIPT=start
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    links:
+      - mongo
+  twitter_monitor:
+    container_name: twitter_monitor
+    environment:
+        - APP_STARTUP=mon
+        - ACCESS_TOKEN_SECRECT=${ACCESS_TOKEN_SECRECT}
+        - CONSUMER_SECRECT=${CONSUMER_SECRECT}
+    build: .
+    restart: always
+    links:
+      - mongo
+      - predictor
+  predictor:
+    container_name: predictor
+    restart: always
+    build: Tensorflow/.
+    ports:
+      - "5000:5000"
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./db:/data/db
+    ports:
+      - "27017:27017"
